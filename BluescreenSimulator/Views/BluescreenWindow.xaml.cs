@@ -10,10 +10,15 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using BluescreenSimulator.ViewModels;
 using static System.Windows.Input.Key;
+using System.Drawing;
+using Gma.QrCodeNet.Encoding;
+using Gma.QrCodeNet.Encoding.Windows.Render;
+
 namespace BluescreenSimulator.Views
 {
     public partial class BluescreenWindow : Window
     {
+
         private readonly BluescreenDataViewModel _vm;
         private readonly CancellationTokenSource _source = new CancellationTokenSource();
         private bool _realClose = false;
@@ -25,6 +30,21 @@ namespace BluescreenSimulator.Views
             Closing += Close;
             KeyDown += Window_PreviewKeyDown;
             HookKeyboard();
+            
+            SetUpQR();
+
+        }
+
+        private void SetUpQR()
+        {
+            QrEncoder encoder = new QrEncoder(ErrorCorrectionLevel.M);
+            QrCode qrCode;
+            encoder.TryEncode("STOP CODE HERE", out qrCode);
+            WriteableBitmapRenderer wRenderer = new WriteableBitmapRenderer(new FixedModuleSize(2, QuietZoneModules.Two), Colors.Black, Colors.White);
+            WriteableBitmap wBitmap = new WriteableBitmap(50, 50, 96, 96, PixelFormats.Gray8, null);
+            wRenderer.Draw(wBitmap, qrCode.Matrix);
+
+            img_QRC.Source = wBitmap;
         }
 
         private void Close(object sender, CancelEventArgs e)

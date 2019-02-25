@@ -97,6 +97,7 @@ namespace BluescreenSimulator.ViewModels
                 OnPropertyChanged(property.Name);
             }
         }
+
         [CmdParameter("-e")]
         public string Emoticon
         {

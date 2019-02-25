@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Icon="/frown.ico"
         ResizeMode="NoResize" WindowStartupLocation="CenterOwner"
-        Title="Instructions" Height="490" Width="680">
+        Title="Instructions" Height="511" Width="680">
     <StackPanel>
         <TextBlock Padding="10" FontWeight="Bold">
             BlueScreen Simulator v2.0
@@ -57,6 +57,11 @@
             This software is using the MIT-licensed library 'NDesk.Options'. |
             <Hyperlink NavigateUri="https://opensource.org/licenses/mit-license.php" Click="Hyperlink_Click">MIT License</Hyperlink> |
             <Hyperlink NavigateUri="http://www.ndesk.org/Options" Click="Hyperlink_Click">Project page</Hyperlink>
+        </TextBlock>
+        <TextBlock Padding="10,10,0,0">
+            This software is using the MIT-licensed library 'QrCode.Net'. |
+            <Hyperlink NavigateUri="https://opensource.org/licenses/mit-license.php" Click="Hyperlink_Click">MIT License</Hyperlink> |
+            <Hyperlink NavigateUri="http://qrcodenet.codeplex.com" Click="Hyperlink_Click">Project page</Hyperlink>
         </TextBlock>
     </StackPanel>
 </Window>

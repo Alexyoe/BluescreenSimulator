@@ -59,18 +59,7 @@
                 <Run Text="{Binding Progress, StringFormat={}{0}%}"/> <Run Text="{Binding Complete}"/>
             </TextBlock>
             <StackPanel Margin="0,40,0,0" Orientation="Horizontal">
-                <Image Margin="0,0,20,0" Height="116" Width="116" Visibility="{Binding ShowQR, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <Image.Style>
-                        <Style TargetType="Image">
-                            <Setter Property="Source" Value="/Resources/qr_transparent.png"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding UseOriginalQR}" Value="True">
-                                    <Setter Property="Source" Value="/Resources/qr.png"></Setter>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Image.Style>
-                </Image>
+                <Image x:Name="img_QRC" Margin="0,0,20,0" Height="116" Width="116"></Image>
                 <StackPanel>
                     <TextBlock TextWrapping="WrapWithOverflow" LineHeight="50" FontSize="18" Text="{Binding MoreInfo}"/>
                     <TextBlock Margin="0,10,0,0" TextWrapping="WrapWithOverflow" FontSize="15" Text="{Binding SupportPerson}"/>
