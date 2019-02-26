@@ -1,16 +1,8 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
 using BluescreenSimulator.ViewModels;
 
 namespace BluescreenSimulator.Views
@@ -18,29 +10,20 @@ namespace BluescreenSimulator.Views
     public partial class MainWindow : Window
     {
         private bool enableUnsafe;
-        private BluescreenDataViewModel _vm;
+        private MainWindowViewModel _vm;
+        private IBluescreenViewModel CurrentBluescreen => _vm.SelectedBluescreen;
         public MainWindow(bool enableUnsafe)
         {
             InitializeComponent();
-            DataContext = _vm = new BluescreenDataViewModel();
+            DataContext = _vm = new MainWindowViewModel();
             this.enableUnsafe = enableUnsafe;
-
-            var title = "BluescreenSimulator v2.0";
-            if (enableUnsafe)
-            {
-                title += " (Unsafe Mode)";
-            }
-
-            MainWindowFrame.Title = title;
-
-            Closing += WarnClose;
         }
 
         private void ShowBSOD(object sender, RoutedEventArgs e)
         {
             if (CheckData())
             {
-                _vm.ExecuteCommand.Execute(ShowBluescreen);
+                CurrentBluescreen.ShowView();
             }
         }
 
@@ -113,49 +96,32 @@ namespace BluescreenSimulator.Views
         private string GenerateCommand()
         {
             var success = CheckData();
-            if (!success) return null;
-            return _vm.CreateCommandParameters();
-        }
-        private void WarnClose(object sender, CancelEventArgs e)
-        {
-            if (!_vm.IsWaiting)
-            {
-                var messageBoxResult = MessageBox.Show("Do you want to exit? The scheduled BSOD will remain scheduled. If you want to interrupt it, you have to kill the process.",
-                    "Confirm", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                if (messageBoxResult == MessageBoxResult.Yes)
-                {
-                    e.Cancel = false;
-                }
-                else
-                {
-                    e.Cancel = true;
-                }
-            }
+            if (!success) return "";
+            return CurrentBluescreen.CreateCommandParameters();
         }
 
-        public Action ShowBluescreen => ShowBlueScreenImpl;
-        
-        private void ShowBlueScreenImpl()
+        private static void ShowOnMonitor(System.Windows.Forms.Screen screen, Window window)
         {
-            ShowBluescreenWindow(_vm);
-        }
+            window.WindowStyle = WindowStyle.None;
+            window.WindowStartupLocation = WindowStartupLocation.Manual;
 
-        public static void ShowBluescreenWindow(BluescreenDataViewModel vm)
-        {
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                var bluescreenView = new BluescreenWindow(vm);
-                bluescreenView.Show();
-            });
+            window.WindowState = WindowState.Normal;
+
+            window.Left = screen.Bounds.Left;
+            window.Top = screen.Bounds.Top;
+
+            window.SourceInitialized += (snd, arg) => window.WindowState = WindowState.Maximized;
+
+            window.Show();
         }
 
         private bool CheckData()
         {          
-            if (_vm.EnableUnsafe && !string.IsNullOrEmpty(CmdCommand.Text.Trim()))
+            if (CurrentBluescreen.EnableUnsafe && !string.IsNullOrEmpty(CurrentBluescreen.CmdCommand.Trim()))
             {
                 var messageBoxResult = MessageBox.Show("Using a CMD command can be dangerous. " +
                     "I will not be responsible for any data loss or other damage arising from irresponsible or careless use of the CMD command option. " +
-                    "Please re-check your command to make sure that you execute what you intended:\r\n\r\n" + CmdCommand.Text.Trim() + "\r\n\r\n" + "Do you want to proceed?",
+                    "Please re-check your command to make sure that you execute what you intended:\r\n\r\n" + CurrentBluescreen.CmdCommand.Trim() + "\r\n\r\n" + "Do you want to proceed?",
                     "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
                 if (messageBoxResult == MessageBoxResult.No)
                 {
